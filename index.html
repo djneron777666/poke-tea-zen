@@ -3,62 +3,223 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ПокеЧай Дзен</title>
-
-<link rel="manifest" href="manifest.json">
+<title>🍵 PokéЧай Дзен</title>
 
 <style>
-body {
-    margin:0;
-    font-family:-apple-system;
-    background:#1e3a2f;
-    color:#f2e8cf;
-    text-align:center;
+body{
+ margin:0;
+ font-family:-apple-system;
+ background:#1e3a2f;
+ color:#f2e8cf;
+ text-align:center;
+ transition:1s;
+ overflow:hidden;
 }
-.container { padding:20px; }
-.pokemon { font-size:64px; animation: float 3s infinite; }
-@keyframes float {
-    50% {transform:translateY(-10px);}
+
+/* контейнер */
+.container{ padding:20px; }
+
+/* покемон */
+.pokemon{
+ font-size:70px;
+ animation: float 4s ease-in-out infinite;
 }
-textarea { width:90%; height:100px; border-radius:15px; }
-button { padding:10px; border-radius:15px; background:#3c805a; color:white; border:none; }
+@keyframes float{
+ 50%{transform:translateY(-12px);}
+}
+
+/* дыхание */
+.breath{
+ font-size:18px;
+ margin:10px;
+ animation: breathe 4s infinite;
+}
+@keyframes breathe{
+ 50%{transform:scale(1.2);}
+}
+
+/* textarea */
+textarea{
+ width:90%;
+ height:100px;
+ border-radius:15px;
+ padding:10px;
+ border:none;
+}
+
+/* кнопки */
+button{
+ padding:10px;
+ border-radius:15px;
+ background:#3c805a;
+ color:white;
+ border:none;
+ margin:5px;
+}
+
+/* сакура */
+canvas{
+ position:fixed;
+ top:0;
+ left:0;
+ z-index:-1;
+}
+
+/* серия */
+.streak{ opacity:0.8; font-size:14px; }
+
+/* цитата */
+.quote{ font-style:italic; opacity:0.8; margin:10px; }
+
 </style>
 </head>
 
 <body>
 
+<canvas id="sakura"></canvas>
+
 <div class="container">
-<h1>🍵 ПокеЧай</h1>
+
+<h2>🍵 PokéЧай Дзен</h2>
 
 <div class="pokemon" id="pokemon">😊</div>
 
-<select onchange="pokemon(this.value)">
+<div class="breath">🍃 вдох... выдох...</div>
+
+<div class="quote" id="quote"></div>
+<div class="streak" id="streak"></div>
+
+<textarea id="text" placeholder="Как ты сегодня?"></textarea>
+
+<br>
+
+<select onchange="setMood(this.value)">
 <option value="😊">Пикачу</option>
 <option value="😌">Снорлакс</option>
 <option value="🔥">Чаризард</option>
+<option value="🤔">Мью</option>
 </select>
 
-<br><br>
+<select onchange="theme(this.value)">
+<option value="green">Лунцзин</option>
+<option value="dark">Пуэр</option>
+<option value="gold">Улун</option>
+</select>
 
-<textarea id="text" placeholder="Как ты сегодня?"></textarea><br><br>
+<br>
 
-<button onclick="save()">Сохранить</button>
+<button onclick="save()">💾</button>
+<button onclick="toggleSound()">🍃</button>
+
 </div>
 
 <script>
-function pokemon(v){
+
+/* 🌸 сакура */
+const canvas=document.getElementById("sakura");
+const ctx=canvas.getContext("2d");
+
+function resize(){
+ canvas.width=innerWidth;
+ canvas.height=innerHeight;
+}
+resize();
+window.onresize=resize;
+
+let petals=[];
+for(let i=0;i<40;i++){
+ petals.push({
+  x:Math.random()*canvas.width,
+  y:Math.random()*canvas.height,
+  r:Math.random()*4+1,
+  d:Math.random()*1.5+0.5
+ });
+}
+
+function draw(){
+ ctx.clearRect(0,0,canvas.width,canvas.height);
+ ctx.fillStyle="pink";
+ ctx.beginPath();
+ petals.forEach(p=>{
+  ctx.moveTo(p.x,p.y);
+  ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+ });
+ ctx.fill();
+
+ petals.forEach(p=>{
+  p.y+=p.d;
+  if(p.y>canvas.height) p.y=0;
+ });
+}
+setInterval(draw,30);
+
+/* 🎮 настроение */
+function setMood(v){
  document.getElementById("pokemon").innerText=v;
 }
 
-function save(){
- localStorage.setItem("t",text.value);
- alert("Сохранено 🍵");
+/* 🍵 тема */
+function theme(t){
+ if(t==="dark") document.body.style.background="#111";
+ if(t==="green") document.body.style.background="#1e3a2f";
+ if(t==="gold") document.body.style.background="#3a2f1e";
 }
 
-window.onload=()=>{
- let d=localStorage.getItem("t");
+/* 📜 цитаты */
+const quotes=[
+"Ты уже достаточно хорош",
+"Чай — это пауза в мире шума",
+"Тишина лечит глубже слов",
+"Позволь дню просто быть"
+];
+document.getElementById("quote").innerText=
+quotes[Math.floor(Math.random()*quotes.length)];
+
+/* 🔥 серия */
+function streak(){
+ let last=localStorage.getItem("d");
+ let s=localStorage.getItem("s")||0;
+ let t=new Date().toDateString();
+
+ if(last!==t){
+  if(last){
+   let diff=(new Date(t)-new Date(last))/(1000*60*60*24);
+   s = diff===1 ? ++s : 1;
+  } else s=1;
+
+  localStorage.setItem("s",s);
+  localStorage.setItem("d",t);
+ }
+
+ document.getElementById("streak").innerText="🔥 "+s+" дней";
+}
+streak();
+
+/* 💾 сохранение */
+function save(){
+ localStorage.setItem("note",text.value);
+}
+
+/* загрузка */
+onload=()=>{
+ let d=localStorage.getItem("note");
  if(d) text.value=d;
 }
+
+/* 🔊 звук */
+let audio;
+function toggleSound(){
+ if(!audio){
+  audio=new Audio("https://cdn.pixabay.com/audio/2022/03/15/audio_5c4e6f5d4e.mp3");
+  audio.loop=true;
+  audio.volume=0.3;
+  audio.play().catch(()=>alert("Нажми ещё раз 🍃"));
+ }else{
+  audio.pause();
+  audio=null;
+ }
+}
+
 </script>
 
 </body>
