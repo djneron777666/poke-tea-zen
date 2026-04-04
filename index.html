@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ПокеЧай Дзен</title>
+
+<link rel="manifest" href="manifest.json">
+
+<style>
+body {
+    margin:0;
+    font-family:-apple-system;
+    background:#1e3a2f;
+    color:#f2e8cf;
+    text-align:center;
+}
+.container { padding:20px; }
+.pokemon { font-size:64px; animation: float 3s infinite; }
+@keyframes float {
+    50% {transform:translateY(-10px);}
+}
+textarea { width:90%; height:100px; border-radius:15px; }
+button { padding:10px; border-radius:15px; background:#3c805a; color:white; border:none; }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h1>🍵 ПокеЧай</h1>
+
+<div class="pokemon" id="pokemon">😊</div>
+
+<select onchange="pokemon(this.value)">
+<option value="😊">Пикачу</option>
+<option value="😌">Снорлакс</option>
+<option value="🔥">Чаризард</option>
+</select>
+
+<br><br>
+
+<textarea id="text" placeholder="Как ты сегодня?"></textarea><br><br>
+
+<button onclick="save()">Сохранить</button>
+</div>
+
+<script>
+function pokemon(v){
+ document.getElementById("pokemon").innerText=v;
+}
+
+function save(){
+ localStorage.setItem("t",text.value);
+ alert("Сохранено 🍵");
+}
+
+window.onload=()=>{
+ let d=localStorage.getItem("t");
+ if(d) text.value=d;
+}
+</script>
+
+</body>
+</html>
