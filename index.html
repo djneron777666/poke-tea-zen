@@ -16,10 +16,8 @@ body{
  overflow:hidden;
 }
 
-/* контейнер */
 .container{ padding:20px; }
 
-/* покемон */
 .pokemon{
  font-size:70px;
  animation: float 4s ease-in-out infinite;
@@ -28,7 +26,6 @@ body{
  50%{transform:translateY(-12px);}
 }
 
-/* дыхание */
 .breath{
  font-size:18px;
  margin:10px;
@@ -38,7 +35,6 @@ body{
  50%{transform:scale(1.2);}
 }
 
-/* textarea */
 textarea{
  width:90%;
  height:100px;
@@ -47,7 +43,6 @@ textarea{
  border:none;
 }
 
-/* кнопки */
 button{
  padding:10px;
  border-radius:15px;
@@ -57,7 +52,6 @@ button{
  margin:5px;
 }
 
-/* сакура */
 canvas{
  position:fixed;
  top:0;
@@ -65,12 +59,8 @@ canvas{
  z-index:-1;
 }
 
-/* серия */
 .streak{ opacity:0.8; font-size:14px; }
-
-/* цитата */
 .quote{ font-style:italic; opacity:0.8; margin:10px; }
-
 </style>
 </head>
 
@@ -111,9 +101,13 @@ canvas{
 <button onclick="save()">💾</button>
 <button onclick="toggleSound()">🍃</button>
 
-</к
+</div>
 
- <script>
+<script>
+
+/* элементы */
+const textArea = document.getElementById("text");
+const pokemon = document.getElementById("pokemon");
 
 /* 🌸 сакура */
 const canvas=document.getElementById("sakura");
@@ -155,7 +149,7 @@ setInterval(draw,30);
 
 /* 🎮 настроение */
 function setMood(v){
- document.getElementById("pokemon").innerText=v;
+ pokemon.innerText = v;
 }
 
 /* 🍵 тема */
@@ -172,10 +166,10 @@ const quotes=[
 "Тишина лечит глубже слов",
 "Позволь дню просто быть"
 ];
-document.getElementById("quote").innerText=
+document.getElementById("quote").innerText =
 quotes[Math.floor(Math.random()*quotes.length)];
 
-/* 🔥 серия */
+/* 🔥 серия дней */
 function streak(){
  let last=localStorage.getItem("d");
  let s=localStorage.getItem("s")||0;
@@ -195,38 +189,48 @@ function streak(){
 }
 streak();
 
-/* 💾 сохранение (FIX) */
+/* 💾 сохранение */
 function save(){
- const text = document.getElementById("text");
- localStorage.setItem("note", text.value);
+ localStorage.setItem("note", textArea.value);
  alert("Сохранено 🍵");
 }
 
 /* загрузка */
 window.onload=()=>{
- const text = document.getElementById("text");
- let d=localStorage.getItem("note");
- if(d) text.value=d;
+ let saved = localStorage.getItem("note");
+ if(saved){
+   textArea.value = saved;
+ }
 }
 
-/* 🔊 звук (FIX для iPhone) */
-let audio;
+/* 🔊 звук (фикс для iPhone) */
+let audio = null;
+
 function toggleSound(){
  if(!audio){
-  audio=new Audio("https://cdn.pixabay.com/audio/2022/03/15/audio_5c4e6f5d4e.mp3");
-  audio.loop=true;
-  audio.volume=0.3;
+   audio = new Audio("https://cdn.pixabay.com/audio/2022/10/25/audio_946b6f6a6c.mp3");
+   audio.loop = true;
+   audio.volume = 0.3;
 
-  audio.play().then(()=>{
-    console.log("играет");
-  }).catch(()=>{
-    alert("Нажми ещё раз для запуска звука 🍃");
-  });
+   document.body.addEventListener("touchstart", startAudioOnce, { once: true });
 
- }else{
-  audio.pause();
-  audio=null;
+   audio.play().catch(()=> {
+     alert("Нажми ещё раз 🍃");
+   });
+
+ } else {
+   audio.pause();
+   audio = null;
+ }
+}
+
+function startAudioOnce(){
+ if(audio){
+   audio.play();
  }
 }
 
 </script>
+
+</body>
+</html>
