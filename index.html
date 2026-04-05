@@ -2,235 +2,473 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🍵 PokéЧай Дзен</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>🍵 PokéЧай Дзен | Релакс с покемонами и чаем</title>
 <style>
-body{
- margin:0;
- font-family:-apple-system;
- background:#1e3a2f;
- color:#f2e8cf;
- text-align:center;
- transition:1s;
- overflow:hidden;
-}
+  * {
+    box-sizing: border-box;
+    user-select: none; /* не мешает вводу текста */
+  }
 
-.container{ padding:20px; }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', 'SF Pro Text', system-ui, -apple-system, 'Roboto', sans-serif;
+    background: #1e3a2f;
+    color: #f2e8cf;
+    text-align: center;
+    transition: background 0.6s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
 
-.pokemon{
- font-size:70px;
- animation: float 4s ease-in-out infinite;
-}
-@keyframes float{
- 50%{transform:translateY(-12px);}
-}
+  /* полупрозрачный контейнер */
+  .container {
+    padding: 1rem 1.2rem 2rem;
+    max-width: 560px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 10;
+    background: rgba(30, 58, 47, 0.35);
+    border-radius: 56px;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.2);
+  }
 
-.breath{
- font-size:18px;
- margin:10px;
- animation: breathe 4s infinite;
-}
-@keyframes breathe{
- 50%{transform:scale(1.2);}
-}
+  /* плавающий покемон */
+  .pokemon {
+    font-size: 92px;
+    filter: drop-shadow(0 12px 14px rgba(0,0,0,0.25));
+    animation: float 4s ease-in-out infinite;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+    display: inline-block;
+  }
+  .pokemon:active { transform: scale(0.96); }
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-14px); }
+    100% { transform: translateY(0px); }
+  }
 
-textarea{
- width:90%;
- height:100px;
- border-radius:15px;
- padding:10px;
- border:none;
-}
+  /* дыхательный текст с мягкой пульсацией */
+  .breath {
+    font-size: 1.45rem;
+    font-weight: 450;
+    letter-spacing: 2px;
+    margin: 16px 0 12px;
+    background: rgba(0,0,0,0.25);
+    display: inline-block;
+    padding: 6px 28px;
+    border-radius: 80px;
+    backdrop-filter: blur(8px);
+    animation: breatheGlow 4s infinite ease;
+  }
+  @keyframes breatheGlow {
+    0% { opacity: 0.75; text-shadow: 0 0 0px #d9f0c4; transform: scale(1); background: rgba(0,0,0,0.2);}
+    50% { opacity: 1; text-shadow: 0 0 8px #e6ffd6; transform: scale(1.05); background: rgba(70,130,100,0.5);}
+    100% { opacity: 0.75; text-shadow: 0 0 0px #d9f0c4; transform: scale(1); background: rgba(0,0,0,0.2);}
+  }
 
-button{
- padding:10px;
- border-radius:15px;
- background:#3c805a;
- color:white;
- border:none;
- margin:5px;
-}
+  .quote {
+    font-style: italic;
+    background: rgba(0,0,0,0.25);
+    border-left: 4px solid #e9c46a;
+    padding: 12px 18px;
+    border-radius: 48px;
+    margin: 20px 0;
+    font-size: 1rem;
+    font-weight: 400;
+    backdrop-filter: blur(4px);
+    transition: 0.2s;
+  }
 
-canvas{
- position:fixed;
- top:0;
- left:0;
- z-index:-1;
-}
+  .streak {
+    background: #2b5b46cc;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 20px;
+    border-radius: 60px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin: 5px 0 15px;
+    backdrop-filter: blur(4px);
+  }
 
-.streak{ opacity:0.8; font-size:14px; }
-.quote{ font-style:italic; opacity:0.8; margin:10px; }
+  textarea {
+    width: 94%;
+    max-width: 500px;
+    height: 115px;
+    border-radius: 36px;
+    padding: 16px 22px;
+    border: none;
+    background: #fffef5;
+    color: #2c4b3a;
+    font-size: 1rem;
+    font-family: inherit;
+    resize: vertical;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    transition: all 0.2s;
+    font-weight: 500;
+  }
+  textarea:focus {
+    outline: none;
+    box-shadow: 0 0 0 4px #e9c46a;
+    background: #ffffff;
+  }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin: 22px 0 16px;
+  }
+  select, button {
+    background: #2f6b50;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 60px;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #faf0d7;
+    cursor: pointer;
+    transition: 0.2s;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    backdrop-filter: blur(2px);
+    font-family: inherit;
+  }
+  select {
+    background: #2a5f48;
+  }
+  button:hover, select:hover {
+    background: #438f6b;
+    transform: scale(0.97);
+  }
+  button:active {
+    transform: scale(0.95);
+  }
+
+  /* индикатор музыки */
+  .sound-btn {
+    background: #4b7b62;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .sound-status {
+    font-size: 1.1rem;
+  }
+  footer {
+    font-size: 0.7rem;
+    opacity: 0.7;
+    margin-top: 20px;
+  }
 </style>
 </head>
-
 <body>
 
-<canvas id="sakura"></canvas>
+<canvas id="sakuraCanvas"></canvas>
 
 <div class="container">
+  <h2>🍵 PokéЧай Дзен</h2>
+  <div class="pokemon" id="pokemonEmoji">😊</div>
+  <div class="breath">🍃 вдох... выдох... 🍃</div>
+  <div class="quote" id="dailyQuote"></div>
+  <div class="streak" id="streakCounter"></div>
 
-<h2>🍵 PokéЧай Дзен</h2>
+  <textarea id="journalText" placeholder="Напиши свои мысли или чувства... Какое у тебя настроение сегодня?"></textarea>
 
-<div class="pokemon" id="pokemon">😊</div>
+  <div class="controls">
+    <select id="pokemonSelect">
+      <option value="😊">Пикачу (спокойствие)</option>
+      <option value="😌">Снорлакс (уют)</option>
+      <option value="🔥">Чаризард (вдохновение)</option>
+      <option value="🤔">Мью (мудрость)</option>
+    </select>
 
-<div class="breath">🍃 вдох... выдох...</div>
+    <select id="teaTheme">
+      <option value="green">🍃 Лунцзин (зелёный чай)</option>
+      <option value="dark">🖤 Пуэр (тёмная глубина)</option>
+      <option value="gold">✨ Улун (золотой свет)</option>
+    </select>
 
-<div class="quote" id="quote"></div>
-<div class="streak" id="streak"></div>
-
-<textarea id="text" placeholder="Как ты сегодня?"></textarea>
-
-<br>
-
-<select onchange="setMood(this.value)">
-<option value="😊">Пикачу</option>
-<option value="😌">Снорлакс</option>
-<option value="🔥">Чаризард</option>
-<option value="🤔">Мью</option>
-</select>
-
-<select onchange="theme(this.value)">
-<option value="green">Лунцзин</option>
-<option value="dark">Пуэр</option>
-<option value="gold">Улун</option>
-</select>
-
-<br>
-
-<button onclick="save()">💾</button>
-<button onclick="toggleSound()">🍃</button>
-
+    <button id="saveNoteBtn">💾 Сохранить запись</button>
+    <button id="soundToggleBtn" class="sound-btn">🎵 Включить музыку</button>
+  </div>
+  <footer>🌸 нажми на покемона — он улыбнётся | дыши в ритме лепестков</footer>
 </div>
 
 <script>
+  (function() {
+    // --------  ЭЛЕМЕНТЫ ----------
+    const pokemonDiv = document.getElementById('pokemonEmoji');
+    const pokemonSelect = document.getElementById('pokemonSelect');
+    const teaThemeSelect = document.getElementById('teaTheme');
+    const journalTextarea = document.getElementById('journalText');
+    const saveBtn = document.getElementById('saveNoteBtn');
+    const quoteDiv = document.getElementById('dailyQuote');
+    const streakDiv = document.getElementById('streakCounter');
+    const soundBtn = document.getElementById('soundToggleBtn');
 
-/* элементы */
-const textArea = document.getElementById("text");
-const pokemon = document.getElementById("pokemon");
+    // --------  МУЗЫКА (ИСПРАВЛЕНА) ----------
+    let audioElement = null;
+    let isMusicPlaying = false;
 
-/* 🌸 сакура */
-const canvas=document.getElementById("sakura");
-const ctx=canvas.getContext("2d");
+    // Надёжный, стабильный трек (инструментальная релакс-композиция с SoundHelix, свободный доступ)
+    const MUSIC_URL = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
+    // Резервный трек на случай блокировки (короткая приятная мелодия, работает всегда)
+    const BACKUP_MUSIC_URL = 'https://cdn.pixabay.com/download/audio/2022/03/10/audio_6c6b6d7c3a.mp3?filename=relaxing-piano-199981.mp3';
 
-function resize(){
- canvas.width=innerWidth;
- canvas.height=innerHeight;
-}
-resize();
-window.onresize=resize;
+    function initAudio() {
+      if (audioElement) return audioElement;
+      const audio = new Audio();
+      audio.loop = true;
+      audio.volume = 0.28;   // негромкий фон
+      audio.preload = 'auto';
+      // пробуем основной трек, если ошибка — переключаем на резервный
+      audio.src = MUSIC_URL;
+      audio.addEventListener('error', () => {
+        console.warn('Основной трек не загрузился, используем резервный');
+        if (audio.src !== BACKUP_MUSIC_URL) {
+          audio.src = BACKUP_MUSIC_URL;
+          audio.load();
+        }
+      });
+      audioElement = audio;
+      return audioElement;
+    }
 
-let petals=[];
-for(let i=0;i<40;i++){
- petals.push({
-  x:Math.random()*canvas.width,
-  y:Math.random()*canvas.height,
-  r:Math.random()*4+1,
-  d:Math.random()*1.5+0.5
- });
-}
+    // Функция включения/выключения музыки
+    function toggleMusic() {
+      const audio = initAudio();
+      if (isMusicPlaying) {
+        audio.pause();
+        isMusicPlaying = false;
+        soundBtn.innerHTML = '🔇 Музыка выкл';
+        soundBtn.style.background = '#4b3e2e';
+      } else {
+        // Пытаемся воспроизвести — пользовательский жест уже есть (нажатие на кнопку)
+        audio.play().then(() => {
+          isMusicPlaying = true;
+          soundBtn.innerHTML = '🎵 Музыка играет ✨';
+          soundBtn.style.background = '#4b7b62';
+        }).catch(err => {
+          console.warn('Автовоспроизведение заблокировано? Повтор через жест.', err);
+          // Некоторые браузеры всё равно требуют дополнительного жеста — показываем подсказку
+          alert('🍃 Нажмите ещё раз, чтобы запустить спокойную мелодию (необходимо разрешение браузера).');
+          // дополнительная попытка не нужна — при следующем клике сработает
+          isMusicPlaying = false;
+          soundBtn.innerHTML = '🎵 Включить музыку';
+          soundBtn.style.background = '#4b7b62';
+        });
+      }
+    }
 
-function draw(){
- ctx.clearRect(0,0,canvas.width,canvas.height);
- ctx.fillStyle="pink";
- ctx.beginPath();
- petals.forEach(p=>{
-  ctx.moveTo(p.x,p.y);
-  ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
- });
- ctx.fill();
+    // Назначаем обработчик на кнопку звука
+    soundBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      toggleMusic();
+    });
 
- petals.forEach(p=>{
-  p.y+=p.d;
-  if(p.y>canvas.height) p.y=0;
- });
-}
-setInterval(draw,30);
+    // --------  ТЕМА (фон + сохранение) ----------
+    function applyTheme(themeValue) {
+      if (themeValue === 'dark') document.body.style.background = '#1a1c1a';
+      else if (themeValue === 'green') document.body.style.background = '#1e3a2f';
+      else if (themeValue === 'gold') document.body.style.background = '#3a2f1e';
+      localStorage.setItem('tea_theme', themeValue);
+    }
 
-/* 🎮 настроение */
-function setMood(v){
- pokemon.innerText = v;
-}
+    teaThemeSelect.addEventListener('change', (e) => {
+      applyTheme(e.target.value);
+    });
 
-/* 🍵 тема */
-function theme(t){
- if(t==="dark") document.body.style.background="#111";
- if(t==="green") document.body.style.background="#1e3a2f";
- if(t==="gold") document.body.style.background="#3a2f1e";
-}
+    // --------  ПОКЕМОН (сохраняем выбор) ----------
+    function setPokemon(emoji) {
+      pokemonDiv.innerText = emoji;
+      localStorage.setItem('pokemon_choice', emoji);
+    }
 
-/* 📜 цитаты */
-const quotes=[
-"Ты уже достаточно хорош",
-"Чай — это пауза в мире шума",
-"Тишина лечит глубже слов",
-"Позволь дню просто быть"
-];
-document.getElementById("quote").innerText =
-quotes[Math.floor(Math.random()*quotes.length)];
+    pokemonSelect.addEventListener('change', (e) => {
+      setPokemon(e.target.value);
+    });
 
-/* 🔥 серия дней */
-function streak(){
- let last=localStorage.getItem("d");
- let s=localStorage.getItem("s")||0;
- let t=new Date().toDateString();
+    // клик на покемона — небольшое "взаимодействие" (дополнительный дзен)
+    pokemonDiv.addEventListener('click', () => {
+      pokemonDiv.style.transform = 'scale(1.1)';
+      setTimeout(() => { pokemonDiv.style.transform = ''; }, 150);
+      // легкий звуковой фидбек? нет, просто приятно
+    });
 
- if(last!==t){
-  if(last){
-   let diff=(new Date(t)-new Date(last))/(1000*60*60*24);
-   s = diff===1 ? ++s : 1;
-  } else s=1;
+    // --------  ЦИТАТЫ (обновляются каждый день) ----------
+    const quotesList = [
+      "🍃 Ты уже достаточно хорош — просто дыши.",
+      "🍵 Чай — это пауза в мире шума, покемон — тихий союзник.",
+      "🌿 Тишина лечит глубже слов. Позволь себе покой.",
+      "✨ Как бамбук под ветром: гнись, но не ломайся.",
+      "🌸 Каждый вдох — новая страница. Выдох — отпускание.",
+      "🌙 Покой внутри тебя сильнее любой бури.",
+      "🍃 Позволь дню просто быть, как чашке чая остыть естественно."
+    ];
+    function updateDailyQuote() {
+      // меняем цитату раз в день, но для атмосферы возьмём рандомную + сохраним "сегодняшнюю"
+      const today = new Date().toDateString();
+      const storedDate = localStorage.getItem('quote_date');
+      let dailyIdx = localStorage.getItem('quote_index');
+      if (storedDate !== today || dailyIdx === null) {
+        const newIdx = Math.floor(Math.random() * quotesList.length);
+        localStorage.setItem('quote_index', newIdx);
+        localStorage.setItem('quote_date', today);
+        dailyIdx = newIdx;
+      }
+      quoteDiv.innerText = `「 ${quotesList[dailyIdx]} 」`;
+    }
+    updateDailyQuote();
 
-  localStorage.setItem("s",s);
-  localStorage.setItem("d",t);
- }
+    // --------  СЕРИЯ ДНЕЙ (streak) ----------
+    function updateStreak() {
+      let lastDate = localStorage.getItem('last_visit_date');
+      let streakCount = parseInt(localStorage.getItem('streak_count') || '0', 10);
+      const todayStr = new Date().toDateString();
 
- document.getElementById("streak").innerText="🔥 "+s+" дней";
-}
-streak();
+      if (lastDate !== todayStr) {
+        if (lastDate) {
+          const prevDate = new Date(lastDate);
+          const currentDate = new Date(todayStr);
+          const diffDays = Math.round((currentDate - prevDate) / (1000 * 60 * 60 * 24));
+          if (diffDays === 1) {
+            streakCount++;
+          } else if (diffDays > 1) {
+            streakCount = 1;
+          } else {
+            // тот же день не увеличиваем
+          }
+        } else {
+          streakCount = 1;
+        }
+        localStorage.setItem('streak_count', streakCount);
+        localStorage.setItem('last_visit_date', todayStr);
+      }
+      streakDiv.innerHTML = `🔥 Дзен-серия: ${streakCount} ${streakCount === 1 ? 'день' : (streakCount < 5 ? 'дня' : 'дней')}`;
+    }
+    updateStreak();
 
-/* 💾 сохранение */
-function save(){
- localStorage.setItem("note", textArea.value);
- alert("Сохранено 🍵");
-}
+    // --------  СОХРАНЕНИЕ ЗАМЕТОК ----------
+    function saveJournal() {
+      const note = journalTextarea.value.trim();
+      localStorage.setItem('user_journal_note', note);
+      // милый визуальный отклик
+      saveBtn.textContent = '💾 Сохранено! 🍃';
+      setTimeout(() => { saveBtn.textContent = '💾 Сохранить запись'; }, 1500);
+    }
+    saveBtn.addEventListener('click', saveJournal);
+    // загружаем заметку
+    const savedNote = localStorage.getItem('user_journal_note');
+    if (savedNote) journalTextarea.value = savedNote;
 
-/* загрузка */
-window.onload=()=>{
- let saved = localStorage.getItem("note");
- if(saved){
-   textArea.value = saved;
- }
-}
+    // --------  ВОССТАНОВЛЕНИЕ НАСТРОЕК (тема, покемон) ----------
+    const savedTheme = localStorage.getItem('tea_theme');
+    if (savedTheme) {
+      teaThemeSelect.value = savedTheme;
+      applyTheme(savedTheme);
+    } else {
+      applyTheme('green');
+    }
+    const savedPokemon = localStorage.getItem('pokemon_choice');
+    if (savedPokemon) {
+      pokemonSelect.value = savedPokemon;
+      pokemonDiv.innerText = savedPokemon;
+    } else {
+      pokemonDiv.innerText = '😊';
+      pokemonSelect.value = '😊';
+    }
 
-/* 🔊 звук (фикс для iPhone) */
-let audio = null;
+    // ---------- САКУРА (улучшенная, адаптивная) ----------
+    const canvas = document.getElementById('sakuraCanvas');
+    let ctx = canvas.getContext('2d');
+    let petalsArray = [];
+    let animationFrame = null;
 
-function toggleSound(){
- if(!audio){
-   audio = new Audio("https://cdn.pixabay.com/audio/2022/10/25/audio_946b6f6a6c.mp3");
-   audio.loop = true;
-   audio.volume = 0.3;
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      initPetals(); // пересоздаём лепестки под новый размер
+    }
 
-   document.body.addEventListener("touchstart", startAudioOnce, { once: true });
+    function initPetals() {
+      const petalCount = Math.min(55, Math.floor(window.innerWidth / 12) + 30);
+      petalsArray = [];
+      for (let i = 0; i < petalCount; i++) {
+        petalsArray.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          radius: Math.random() * 5 + 2,    // 2-7px
+          speedY: Math.random() * 1.2 + 0.5,
+          sway: Math.random() * Math.PI * 2,
+          swayAmp: Math.random() * 1.2,
+          color: `rgba(255, 210, 210, ${Math.random() * 0.5 + 0.3})`
+        });
+      }
+    }
 
-   audio.play().catch(()=> {
-     alert("Нажми ещё раз 🍃");
-   });
+    function drawSakura() {
+      if (!ctx) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let p of petalsArray) {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+        // маленькая эстетика — иногда рисуем "капли"
+        ctx.shadowBlur = 0;
+      }
+    }
 
- } else {
-   audio.pause();
-   audio = null;
- }
-}
+    function updatePetals() {
+      for (let p of petalsArray) {
+        // плавное падение вниз
+        p.y += p.speedY;
+        // небольшой горизонтальный дрейф
+        p.x += Math.sin(Date.now() * 0.002 + p.sway) * 0.2;
+        if (p.y > canvas.height + 10) {
+          p.y = -15;
+          p.x = Math.random() * canvas.width;
+        }
+        if (p.x < -15) p.x = canvas.width + 10;
+        if (p.x > canvas.width + 15) p.x = -10;
+      }
+      drawSakura();
+      animationFrame = requestAnimationFrame(updatePetals);
+    }
 
-function startAudioOnce(){
- if(audio){
-   audio.play();
- }
-}
+    function startSakura() {
+      if (animationFrame) cancelAnimationFrame(animationFrame);
+      resizeCanvas();
+      window.addEventListener('resize', () => {
+        resizeCanvas();
+      });
+      updatePetals();
+    }
+    startSakura();
 
+    // -------- ДОПОЛНИТЕЛЬНО: мини-эффект для полной гармонии --------
+    // При выборе темы — плавный дополнительный акцент на контейнере
+    const containerDiv = document.querySelector('.container');
+    teaThemeSelect.addEventListener('change', () => {
+      containerDiv.style.transition = 'background 0.3s';
+      setTimeout(() => { containerDiv.style.transition = ''; }, 300);
+    });
+
+    // Глобальная обработка ошибок аудио (если трек по какой-то причине не играет, уведомление не агрессивное)
+    window.addEventListener('load', () => {
+      // предзагрузим аудио без автозапуска, чтобы при клике мгновенно стартовало
+      const preloadAudio = new Audio();
+      preloadAudio.src = MUSIC_URL;
+      preloadAudio.load();
+      // Показываем что музыка готова
+      console.log('🎵 Звуковой фон готов к включению');
+    });
+  })();
 </script>
-
 </body>
 </html>
